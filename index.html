@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!--MADE BY KJMBSCS1A-->
+        <style>
+            #matOne{
+                display: flex;
+                flex-direction: column;
+            }
+            body{
+                background-color: rgb(39, 37, 37);
+                align-items: center;
+                justify-items: center;
+                justify-content: center;
+                height: 100vh;
+            }
+            #wrapper{
+                background-color: black;
+                border-radius: 10px;
+                padding: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-direction: column;
+                
+            }
+            #matOne{
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-direction: row;
+            }
+            #matOneDiv{
+                align-items: center;
+                justify-content: center;
+            }
+            #choices{
+                display: flex;
+                flex-direction: row;
+                flex-shrink: 2;
+                padding: 5px;
+            }
+            input{
+                border-radius: 5px;
+            }
+            #mainOut{
+                color: white;
+            }
+            #mainMat{
+                color: white;
+            }
+            #header{
+                color: white;
+                font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="wrapper">
+            <h1 id="header">TO ENTER NEW MATRICES JUST REFRESH</h1>
+            <form id = "matOne">
+                <div id="matOneDiv">
+                    <input type="text" id="matOneIn" placeholder="Enter matrix 1 elements">
+                    <input type="text" id = 'widthOne' placeholder="Enter width 1">
+                    <input type="text" id = 'heightOne' placeholder="Enter Height 1">
+                </div>
+                <div id="matTwoDiv">
+                    <input type="text" id="matTwoIn" placeholder="Enter matrix 2 elements">
+                    <input type="text" id = 'widthTwo' placeholder="Enter width 2">
+                    <input type="text" id = 'heightTwo'  placeholder="Enter Height 2">
+                </div>
+                <input type="submit" id="matOneSubmit">
+            </form>
+            <div id="choices">
+                <button id="multiply">Multiply</button>
+                <button id="add">Add</button>
+                <button id="subtract">Subtract</button>
+                <button id="transMatOne">Transpose Matrix One</button>
+                <button id="transMatTwo">Transpose Matrix Two</button>
+                <button id="mapOne">Multiply Matrix One by:</button>
+                <input type="text" id="mapOneIn">
+                <button id="mapTwo">Multiply Matrix Two by:</button>
+                <input type="text" id="mapTwoIn">     
+            </div>
+            <div id="mainMat">
+                <div id="matrixOne"></div>
+                <div id="matrixTwo"></div>
+            </div>  
+            <div id="mainOut">
+            </div>
+        </div>
+        <script>
+            let arrToMat = (arr, width, height) => {
+                let matrix = new Array(height);
+                for(let i = 0; i<height; i++){
+                    matrix[i] = new Array(width);
+                } 
+                let i = 0;
+                let j = 0;
+                let counter = 0;
+                while(i < height){
+                    if(counter != width){
+                        matrix[i][counter] = arr[j];
+                        counter++;
+                        j++;
+                    } else {
+                        i ++;
+                        counter = 0;
+                    }
+                    
+                }
+                return matrix;
+            }
+            document.getElementById('matOne').addEventListener('submit', function(event){
+                event.preventDefault();
+                document.getElementById('mainOut').innerHTML = '';
+                alert('Successfully submited');
+                let matOneIn = document.getElementById('matOneIn').value;
+                let matTwoIn = document.getElementById('matTwoIn').value;
+                //console.log(matOneIn);
+                let sizeOne = [parseInt(document.getElementById('widthOne').value), parseInt(document.getElementById('heightOne').value)];
+                let sizeTwo = [parseInt(document.getElementById('widthTwo').value), parseInt(document.getElementById('heightTwo').value)];
+                //console.log(sizeOne);
+                let matrixOneArr = matOneIn.split(/[\s\n\,\t]+/g).map(Number);
+                let matrixTwoArr = matTwoIn.split(/[\s\n\,\t]+/g).map(Number);
+                //console.log(matrixOneArr);
+                let matOne = arrToMat(matrixOneArr, sizeOne[0], sizeOne[1]);
+                let matTwo = arrToMat(matrixTwoArr, sizeTwo[0], sizeTwo[1]);
+                let matrixBools = {
+                    multipliable: (sizeOne[0] == sizeTwo[1]),
+                    addable: (sizeOne[0] == sizeTwo [0] && sizeOne[1] == sizeTwo[1])
+                }
+                //console.log(matrixBools);
+                //console.log(matOne);
+                //console.log(matTwo);
+                document.getElementById('matrixOne').innerHTML = matOne.join('\n');
+                document.getElementById('matrixTwo').innerHTML = matTwo.join('\n');
+                let matrixAdd = (matOne, matTwo, matBool, width, height) => {
+                    if(!matBool){
+                        return 'The matrices are not addable or subtractable'
+                    }
+                    let matrix = new Array(height);
+                    for(let i = 0; i<height; i++){
+                        matrix[i] = new Array(width);
+                    }
+                    for(let i = 0; i<height;i++){
+                        let counter = 0;
+                        for(let j = 0; j<width; j++){
+                            matrix[i][j] = matOne[i][counter] + matTwo[i][counter];
+                            counter++;
+                        }
+                    }
+                    return matrix;
+                }
+                let matrixSub = (matOne, matTwo, matBool, width, height) => {
+                    if(!matBool){
+                        return 'The matrices are not addable or subtractable'
+                    }
+                    let matrix = new Array(height);
+                    for(let i = 0; i<height; i++){
+                        matrix[i] = new Array(width);
+                    }
+                    for(let i = 0; i<height;i++){
+                        let counter = 0;
+                        for(let j = 0; j<width; j++){
+                            matrix[i][j] = matOne[i][counter] - matTwo[i][counter];
+                            counter++;
+                        }
+                    }
+                    return matrix;
+                }
+                let matrixMultiply = (matOne, matTwo, matBool, heightOne, widthOne, widthTwo) => {
+                    if(!matBool){
+                        return 'The matrices can not be multiplied'
+                    }
+                    //number of columns = second one's columns and rows = 1st ones rows
+                    let matrix = new Array(heightOne);
+                    for(let i = 0; i < heightOne; i++){
+                        matrix[i] = new Array(widthTwo);
+                    }
+                    for(let i = 0; i<heightOne; i++){
+                        
+                        for(let k = 0; k<widthTwo; k++){
+                            let sum = 0;
+                            for(let j = 0; j<widthOne; j++){
+                                sum += matOne[i][j] * matTwo[j][k];
+                            }
+                            matrix[i][k] = sum;
+                        }
+                        
+                    }
+                    return matrix;
+                }
+                let matTranspose = (matrixT, width, height) => {
+                    let matrix = new Array(height);
+                    for(let i = 0; i<height; i++){
+                        matrix[i] = new Array(width);
+                    }
+                    
+                    for(let i = 0; i < height; i++){
+                        for(let j = 0; j <width; j++){
+                            matrix[i][j] = matrixT[j][i];
+                        }
+                    }
+                    return matrix
+                }
+                let mapMatrix = (matrixIn, product) => {
+                    let matrix = new Array(matrixIn.length);
+                    for(let i = 0; i<matrixIn.length; i++){
+                        matrix[i] = new Array(matrixIn[0].length);
+                    }
+                    for(let i = 0; i<matrixIn.length; i++){
+                        matrix[i] = matrixIn[i].map(x => x*product);
+                    }
+                    return matrix
+                }
+                let multipliedMat;
+                let subbedMat;
+                let addedMat;
+                let transposedOne;
+                let transposedTwo;
+                let mappedOne;
+                let mappedTwo;
+                document.getElementById('mapOne').addEventListener('click', function(){
+                    let productOne = parseInt(document.getElementById('mapOneIn').value);
+                    mappedOne = mapMatrix(matOne, productOne);
+                    console.log(mappedOne);
+                    let mainOut = document.getElementById('mainOut');
+                    let uid = `${Date.now()}`
+                    let newDiv = document.createElement('div');
+                    newDiv.id = uid;
+                    mainOut.appendChild(newDiv);
+                    newDiv.textContent = `Matrix One multiplied by ${productOne}:`
+                    for(let i = 0; i<matOne.length; i++){
+                        subDiv = document.createElement('div');
+                        subDiv.id = `${uid}sub${i}`
+                        document.getElementById(`${uid}`).appendChild(subDiv);
+                        subDiv.textContent = mappedOne[i].join(' ');
+                    }
+                })
+                document.getElementById('mapTwo').addEventListener('click', function(){
+                    let productTwo = parseInt(document.getElementById('mapTwoIn').value);
+                    mappedTwo = mapMatrix(matTwo, productTwo);
+                    console.log(mappedTwo);
+                    let mainOut = document.getElementById('mainOut');
+                    let uid = `${Date.now()}`
+                    let newDiv = document.createElement('div');
+                    newDiv.id = uid;
+                    mainOut.appendChild(newDiv);
+                    newDiv.textContent = `Matrix Two multiplied by ${productTwo}:`
+                    for(let i = 0; i<matTwo.length; i++){
+                        subDiv = document.createElement('div');
+                        subDiv.id = `${uid}sub${i}`
+                        document.getElementById(`${uid}`).appendChild(subDiv);
+                        subDiv.textContent = mappedTwo[i].join(' ');
+                    }
+                })
+                document.getElementById('transMatOne').addEventListener('click', function(){
+                    transposedOne = matTranspose(matOne, sizeOne[0], sizeOne[1]);
+                    console.log(transposedOne);
+                    let mainOut = document.getElementById('mainOut');
+                    let uid = `${Date.now()}`
+                    let newDiv = document.createElement('div');
+                    newDiv.id = uid;
+                    mainOut.appendChild(newDiv);
+                    newDiv.textContent = `Matrix One transposed:`
+                    for(let i = 0; i<transposedOne.length; i++){
+                        subDiv = document.createElement('div');
+                        subDiv.id = `${uid}sub${i}`
+                        document.getElementById(`${uid}`).appendChild(subDiv);
+                        subDiv.textContent = transposedOne[i].join(' ');
+                    } 
+                })
+                document.getElementById('transMatTwo').addEventListener('click', function(){
+                    transposedTwo = matTranspose(matTwo, sizeOne[0], sizeOne[1]);
+                    console.log(transposedTwo);
+                    let mainOut = document.getElementById('mainOut');
+                    let uid = `${Date.now()}`
+                    let newDiv = document.createElement('div');
+                    newDiv.id = uid;
+                    mainOut.appendChild(newDiv);
+                    newDiv.textContent = `Matrix Two transposed:`
+                    for(let i = 0; i<transposedTwo.length; i++){
+                        subDiv = document.createElement('div');
+                        subDiv.id = `${uid}sub${i}`
+                        document.getElementById(`${uid}`).appendChild(subDiv);
+                        subDiv.textContent = transposedTwo[i].join(' ');
+                    } 
+                })
+                
+                document.getElementById('multiply').addEventListener('click', function(){
+                    multipliedMat = matrixMultiply(matOne, matTwo, matrixBools.multipliable, sizeOne[1], sizeOne[0], sizeTwo[0]);
+                    console.log(multipliedMat);
+                    let mainOut = document.getElementById('mainOut');
+                    let uid = `${Date.now()}`
+                    let newDiv = document.createElement('div');
+                    newDiv.id = uid;
+                    mainOut.appendChild(newDiv);
+                    newDiv.textContent = `Matrices Multipled:`
+                    for(let i = 0; i<multipliedMat.length; i++){
+                        subDiv = document.createElement('div');
+                        subDiv.id = `${uid}sub${i}`
+                        document.getElementById(`${uid}`).appendChild(subDiv);
+                        subDiv.textContent = multipliedMat[i].join(' ');
+                    } 
+                })
+                document.getElementById('subtract').addEventListener('click', function(){
+                    subbedMat = matrixSub(matOne, matTwo, matrixBools.addable, sizeOne[0], sizeOne[1]);
+                    console.log(subbedMat);
+                    let mainOut = document.getElementById('mainOut');
+                    let uid = `${Date.now()}`
+                    let newDiv = document.createElement('div');
+                    newDiv.id = uid;
+                    mainOut.appendChild(newDiv);
+                    newDiv.textContent = `Subtracted matrices: `
+                    for(let i = 0; i<subbedMat.length; i++){
+                        subDiv = document.createElement('div');
+                        subDiv.id = `${uid}sub${i}`
+                        document.getElementById(`${uid}`).appendChild(subDiv);
+                        subDiv.textContent = subbedMat[i].join(' ');
+                    } 
+                })
+                document.getElementById('add').addEventListener('click', function(){
+                    addedMat = matrixAdd(matOne, matTwo, matrixBools.addable, sizeOne[0], sizeOne[1]);
+                    console.log(addedMat);
+                    let mainOut = document.getElementById('mainOut');
+                    let uid = `${Date.now()}`
+                    let newDiv = document.createElement('div');
+                    newDiv.id = uid;
+                    mainOut.appendChild(newDiv);
+                    newDiv.textContent = `Added matrices: `
+                    for(let i = 0; i<addedMat.length; i++){
+                        subDiv = document.createElement('div');
+                        subDiv.id = `${uid}sub${i}`
+                        document.getElementById(`${uid}`).appendChild(subDiv);
+                        subDiv.textContent = addedMat[i].join(' ');
+                    }
+                })
+            })
+        </script>
+    </body>
+</html>
